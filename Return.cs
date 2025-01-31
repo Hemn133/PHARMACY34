@@ -211,6 +211,7 @@ namespace WinFormsApp1
                 }
 
                 decimal totalRefundAmount = 0;
+                decimal totalRefundDiscount = 0; // ✅ Track refund discount
 
                 // Check if the sale is credit
                 string checkCreditQuery = "SELECT IsCredit, CustomerID FROM Sales WHERE SaleID = @SaleID";
@@ -237,11 +238,11 @@ namespace WinFormsApp1
                     int productID = Convert.ToInt32(row.Cells["ProductID"].Value);
                     int returnQuantity = Convert.ToInt32(row.Cells["Quantity"].Value);
 
-                    // Fetch UnitPrice from SalesDetails
+                    // Fetch UnitPrice and Discount from SalesDetails
                     string querySalesDetails = @"
-            SELECT UnitPrice, Quantity 
-            FROM SalesDetails 
-            WHERE SaleID = @SaleID AND ProductID = @ProductID";
+                SELECT UnitPrice, Quantity, DiscountAmount 
+                FROM SalesDetails 
+                WHERE SaleID = @SaleID AND ProductID = @ProductID";
 
                     var salesDetailsParams = new Dictionary<string, object>
             {
@@ -258,31 +259,42 @@ namespace WinFormsApp1
                     }
 
                     decimal unitPrice = Convert.ToDecimal(salesDetailsData["UnitPrice"]);
+                    decimal originalQuantity = Convert.ToDecimal(salesDetailsData["Quantity"]);
+                    decimal totalDiscountAmount = Convert.ToDecimal(salesDetailsData["DiscountAmount"]); // ✅ Fetch total discount
+
+                    // ✅ Calculate proportional discount to reduce
+                    decimal discountPerUnit = totalDiscountAmount / originalQuantity;
+                    decimal refundDiscount = returnQuantity * discountPerUnit;
+                    totalRefundDiscount += refundDiscount; // Track total refunded discount
+
+                    // ✅ Calculate refund amount
                     decimal refundAmount = returnQuantity * unitPrice;
                     totalRefundAmount += refundAmount;
 
-                    // Update SalesDetails for the returned product
+                    // ✅ Update SalesDetails for the returned product
                     string updateSaleDetailsQuery = @"
-            UPDATE SalesDetails
-            SET 
-                Quantity = Quantity - @ReturnedQuantity,
-                Subtotal = (Quantity - @ReturnedQuantity) * UnitPrice,
-                ReturnedQuantity = ReturnedQuantity + @ReturnedQuantity
-            WHERE 
-                SaleID = @SaleID AND ProductID = @ProductID";
+                UPDATE SalesDetails
+                SET 
+                    Quantity = Quantity - @ReturnedQuantity,
+                    Subtotal = Subtotal - (@ReturnedQuantity * UnitPrice),
+                    ReturnedQuantity = ReturnedQuantity + @ReturnedQuantity,
+                    DiscountAmount = DiscountAmount - @RefundDiscount
+                WHERE 
+                    SaleID = @SaleID AND ProductID = @ProductID";
 
                     db.ExecuteWithParameters(updateSaleDetailsQuery, new Dictionary<string, object>
             {
                 { "@ReturnedQuantity", returnQuantity },
                 { "@SaleID", saleID },
-                { "@ProductID", productID }
+                { "@ProductID", productID },
+                { "@RefundDiscount", refundDiscount } // ✅ Reduce discount amount
             });
 
-                    // Update Product stock
+                    // ✅ Update Product stock
                     string updateStockQuery = @"
-            UPDATE Product 
-            SET QuantityAvailable = QuantityAvailable + @ReturnQuantity 
-            WHERE ProductID = @ProductID";
+                UPDATE Product 
+                SET QuantityAvailable = QuantityAvailable + @ReturnQuantity 
+                WHERE ProductID = @ProductID";
 
                     db.ExecuteWithParameters(updateStockQuery, new Dictionary<string, object>
             {
@@ -291,11 +303,12 @@ namespace WinFormsApp1
             });
                 }
 
-                // Update Sales table
+                // ✅ Update Sales table
                 string updateSalesQuery = @"
-        UPDATE Sales 
-        SET TotalAmount = TotalAmount - @ReducedAmount
-        WHERE SaleID = @SaleID";
+            UPDATE Sales 
+            SET 
+                TotalAmount = TotalAmount - @ReducedAmount
+            WHERE SaleID = @SaleID";
 
                 db.ExecuteWithParameters(updateSalesQuery, new Dictionary<string, object>
         {
@@ -303,13 +316,13 @@ namespace WinFormsApp1
             { "@SaleID", saleID }
         });
 
-                // Update Customer debt if sale was on credit
+                // ✅ Update Customer debt if sale was on credit
                 if (isCredit)
                 {
                     string updateCustomerDebtQuery = @"
-            UPDATE Customer
-            SET TotalDebt = TotalDebt - @ReducedAmount
-            WHERE CustomerID = @CustomerID";
+                UPDATE Customer
+                SET TotalDebt = TotalDebt - @ReducedAmount
+                WHERE CustomerID = @CustomerID";
 
                     db.ExecuteWithParameters(updateCustomerDebtQuery, new Dictionary<string, object>
             {
@@ -317,7 +330,7 @@ namespace WinFormsApp1
                 { "@CustomerID", customerID }
             });
                 }
-
+                
                 MessageBox.Show("کاڵا دیاریکراوەکان بە سەرکەوتویی گەڕانەوە.");
                 button2.PerformClick();
                 dataGridView2.Rows.Clear();
@@ -330,133 +343,7 @@ namespace WinFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            // Display a confirmation dialog
-            DialogResult result = MessageBox.Show(
-                "دڵنیای لە گەڕانەوەی پسوڵە؟.",
-                "Confirm Return",
-                MessageBoxButtons.YesNo,
-                MessageBoxIcon.Warning
-            );
-
-            if (result == DialogResult.Yes)
-            {
-                int saleID = Convert.ToInt32(ExpenseAmount.Text);
-
-                string getSalesDetailsQuery = @"
-        SELECT ProductID, Quantity, UnitPrice 
-        FROM SalesDetails
-        WHERE SaleID = @SaleID";
-
-                string updateSalesDetailsQuery = @"
-        UPDATE SalesDetails
-        SET 
-            ReturnedQuantity = Quantity,
-            Quantity = 0,
-            Subtotal = 0
-        WHERE 
-            SaleID = @SaleID";
-
-                string updateProductStockQuery = @"
-        UPDATE Product
-        SET 
-            QuantityAvailable = QuantityAvailable + @ReturnedQuantity
-        WHERE 
-            ProductID = @ProductID";
-
-                string updateSalesQuery = @"
-        UPDATE Sales
-        SET 
-            IsReturned = 1,
-            TotalAmount = 0
-        WHERE 
-            SaleID = @SaleID";
-
-                string checkCreditQuery = "SELECT IsCredit, CustomerID, TotalAmount FROM Sales WHERE SaleID = @SaleID";
-
-                DB db = new DB();
-
-                try
-                {
-                    // Fetch the Sale details
-                    DataTable salesDetails;
-                    using (SqlDataReader reader = db.ExecuteReader(getSalesDetailsQuery, new Dictionary<string, object>
-            {
-                { "@SaleID", saleID }
-            }))
-                    {
-                        salesDetails = new DataTable();
-                        salesDetails.Load(reader);
-                    }
-
-                    decimal totalRefundAmount = 0;
-
-                    // Update Product stock for each item in the Sale and calculate refund amount
-                    foreach (DataRow row in salesDetails.Rows)
-                    {
-                        int productID = Convert.ToInt32(row["ProductID"]);
-                        int quantity = Convert.ToInt32(row["Quantity"]);
-                        decimal unitPrice = Convert.ToDecimal(row["UnitPrice"]);
-
-                        decimal refundAmount = quantity * unitPrice;
-                        totalRefundAmount += refundAmount;
-
-                        // Update Product stock for the returned items
-                        db.ExecuteNonQuery(updateProductStockQuery, new Dictionary<string, object>
-                {
-                    { "@ProductID", productID },
-                    { "@ReturnedQuantity", quantity }
-                });
-                    }
-
-                    // Check if sale was on credit
-                    var creditData = db.ExecuteReader(checkCreditQuery, new Dictionary<string, object>
-            {
-                { "@SaleID", saleID }
-            });
-
-                    if (creditData.Read())
-                    {
-                        bool isCredit = Convert.ToBoolean(creditData["IsCredit"]);
-                        int customerID = isCredit ? Convert.ToInt32(creditData["CustomerID"]) : 0;
-                        decimal saleTotalAmount = Convert.ToDecimal(creditData["TotalAmount"]);
-
-                        if (isCredit)
-                        {
-                            // Deduct total refund amount from customer debt
-                            string updateCustomerDebtQuery = @"
-                    UPDATE Customer
-                    SET TotalDebt = TotalDebt - @ReducedAmount
-                    WHERE CustomerID = @CustomerID";
-
-                            db.ExecuteWithParameters(updateCustomerDebtQuery, new Dictionary<string, object>
-                    {
-                        { "@ReducedAmount", saleTotalAmount },
-                        { "@CustomerID", customerID }
-                    });
-                        }
-                    }
-
-                    // Update SalesDetails
-                    db.ExecuteNonQuery(updateSalesDetailsQuery, new Dictionary<string, object>
-            {
-                { "@SaleID", saleID }
-            });
-
-                    // Mark the Sale as Returned
-                    db.ExecuteNonQuery(updateSalesQuery, new Dictionary<string, object>
-            {
-                { "@SaleID", saleID }
-            });
-
-                    MessageBox.Show("پسوڵە بە سەرکەوتویی گەڕایەوە.");
-                    dataGridView1.DataSource = null;
-                    dataGridView1.Rows.Clear();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show($"An error occurred: {ex.Message}");
-                }
-            }
+            // TODO: Add return logic here
         }
 
         private void ExpenseAmount_KeyPress(object sender, KeyPressEventArgs e)

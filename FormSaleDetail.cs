@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace WinFormsApp1
@@ -60,13 +56,15 @@ namespace WinFormsApp1
 
             try
             {
-                // Query to fetch Sale details with joins
+                // Query to fetch Sale details with joins, including DiscountAmount
                 string query = @"
     SELECT 
         SD.SaleID AS [کۆدی پسوڵە], 
         P.ProductName AS [ناوی کاڵا], 
         SD.Quantity AS [دانە], 
-        SD.Subtotal AS [نرخ], 
+        SD.UnitPrice AS [نرخی دانە],  -- ✅ Show unit price
+        SD.Subtotal AS [کۆی گشتی],   -- ✅ Show subtotal
+        SD.DiscountAmount AS [داشکاندن], -- ✅ Show discount
         U.Username AS [فرۆشراوە لە لایەن],  
         CASE 
             WHEN S.IsCredit = 1 THEN N'قەرز' 
@@ -88,9 +86,9 @@ namespace WinFormsApp1
     WHERE S.SaleID = @SaleID";
 
                 Dictionary<string, object> parameters = new Dictionary<string, object>
-{
-    { "@SaleID", saleID }
-};
+                {
+                    { "@SaleID", saleID }
+                };
 
                 // Fetch data from the database
                 DataTable salesDetailsData = db.GetDataTableParam(query, parameters);
@@ -107,7 +105,9 @@ namespace WinFormsApp1
 
         private void dataGridViewSaleDetails_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
         {
-            if (dataGridViewSaleDetails.Columns[e.ColumnIndex].Name == "نرخ" && e.Value != null)
+            string columnName = dataGridViewSaleDetails.Columns[e.ColumnIndex].Name;
+
+            if ((columnName == "نرخ" || columnName == "کۆی گشتی" || columnName == "داشکاندن") && e.Value != null)
             {
                 if (decimal.TryParse(e.Value.ToString(), out decimal value))
                 {
@@ -117,9 +117,5 @@ namespace WinFormsApp1
                 }
             }
         }
-
-
-
-
     }
 }

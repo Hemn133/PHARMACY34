@@ -40,7 +40,7 @@
             label11 = new Label();
             label5 = new Label();
             label9 = new Label();
-            label12 = new Label();
+            labelTotalDiscount = new Label();
             label13 = new Label();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             SuspendLayout();
@@ -144,7 +144,7 @@
             label10.BackColor = Color.WhiteSmoke;
             label10.Font = new Font("NRT Bold", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label10.ForeColor = Color.Black;
-            label10.Location = new Point(459, 559);
+            label10.Location = new Point(302, 155);
             label10.Name = "label10";
             label10.Size = new Size(126, 35);
             label10.TabIndex = 47;
@@ -177,23 +177,23 @@
             label9.TabIndex = 50;
             label9.Text = "label9";
             // 
-            // label12
+            // labelTotalDiscount
             // 
-            label12.AutoSize = true;
-            label12.BackColor = Color.WhiteSmoke;
-            label12.Font = new Font("NRT Bold", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label12.ForeColor = Color.Black;
-            label12.Location = new Point(146, 559);
-            label12.Name = "label12";
-            label12.Size = new Size(126, 35);
-            label12.TabIndex = 51;
-            label12.Text = "کۆی گشتی";
+            labelTotalDiscount.AutoSize = true;
+            labelTotalDiscount.BackColor = Color.WhiteSmoke;
+            labelTotalDiscount.Font = new Font("NRT Bold", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            labelTotalDiscount.ForeColor = Color.Black;
+            labelTotalDiscount.Location = new Point(162, 557);
+            labelTotalDiscount.Name = "labelTotalDiscount";
+            labelTotalDiscount.Size = new Size(126, 35);
+            labelTotalDiscount.TabIndex = 51;
+            labelTotalDiscount.Text = "کۆی گشتی";
             // 
             // label13
             // 
             label13.AutoSize = true;
             label13.Font = new Font("NRT Bold", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            label13.Location = new Point(362, 562);
+            label13.Location = new Point(222, 155);
             label13.Name = "label13";
             label13.Size = new Size(78, 27);
             label13.TabIndex = 52;
@@ -205,7 +205,7 @@
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(590, 601);
             Controls.Add(label13);
-            Controls.Add(label12);
+            Controls.Add(labelTotalDiscount);
             Controls.Add(label9);
             Controls.Add(label5);
             Controls.Add(label11);
@@ -240,7 +240,7 @@
         private Label label11;
         private Label label5;
         private Label label9;
-        private Label label12;
+        private Label labelTotalDiscount;
         private Label label13;
     }
 }

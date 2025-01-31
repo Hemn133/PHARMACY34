@@ -221,7 +221,7 @@ namespace WinFormsApp1
                 dataGridView1.Columns.Add("OriginalPrice", "Original Price"); // ✅ New Column for Tracking Original Price
                 dataGridView1.Columns.Add("UnitPrice", "نرخی دانە");       // Unit Price (Editable)
                 dataGridView1.Columns.Add("Subtotal", "کۆی گشتی");        // Subtotal
-                dataGridView1.Columns.Add("TotalDiscount", "totaldiscount"); // Discount Per Product
+                dataGridView1.Columns.Add("TotalDiscount", "داشکاندن"); // Discount Per Product
             }
 
             // Set columns to ReadOnly except for UnitPrice & Quantity
@@ -232,6 +232,8 @@ namespace WinFormsApp1
 
             dataGridView1.Columns["UnitPrice"].ReadOnly = false; // Allow editing of price
             dataGridView1.Columns["Quantity"].ReadOnly = false;  // Allow editing of quantity
+            dataGridView1.Columns["OriginalPrice"].Visible = false;
+            dataGridView1.Columns["ProductID"].Visible = false;
 
             // Apply styling to DataGridViews
             style(dataGridView1);
