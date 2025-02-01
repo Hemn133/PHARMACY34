@@ -107,7 +107,7 @@ namespace WinFormsApp1
         {
             string columnName = dataGridViewSaleDetails.Columns[e.ColumnIndex].Name;
 
-            if ((columnName == "نرخ" || columnName == "کۆی گشتی" || columnName == "داشکاندن") && e.Value != null)
+            if ((columnName == "نرخ" || columnName == "کۆی گشتی" || columnName == "داشکاندن" || columnName == "نرخی دانە") && e.Value != null)
             {
                 if (decimal.TryParse(e.Value.ToString(), out decimal value))
                 {

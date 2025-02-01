@@ -343,7 +343,135 @@ namespace WinFormsApp1
 
         private void button1_Click(object sender, EventArgs e)
         {
-            // TODO: Add return logic here
+            // Display a confirmation dialog
+            DialogResult result = MessageBox.Show(
+                "دڵنیای لە گەڕانەوەی پسوڵە؟.",
+                "Confirm Return",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Warning
+            );
+
+            if (result == DialogResult.Yes)
+            {
+                int saleID = Convert.ToInt32(ExpenseAmount.Text);
+
+                string getSalesDetailsQuery = @"
+            SELECT ProductID, Quantity, UnitPrice, DiscountAmount
+            FROM SalesDetails
+            WHERE SaleID = @SaleID";
+
+                string updateSalesDetailsQuery = @"
+            UPDATE SalesDetails
+            SET 
+                ReturnedQuantity = Quantity,
+                Quantity = 0,
+                Subtotal = 0,
+                DiscountAmount = 0
+            WHERE 
+                SaleID = @SaleID";
+
+                string updateProductStockQuery = @"
+            UPDATE Product
+            SET 
+                QuantityAvailable = QuantityAvailable + @ReturnedQuantity
+            WHERE 
+                ProductID = @ProductID";
+
+                string updateSalesQuery = @"
+            UPDATE Sales
+            SET 
+                IsReturned = 1,
+                TotalAmount = 0
+            WHERE 
+                SaleID = @SaleID";
+
+                string checkCreditQuery = "SELECT IsCredit, CustomerID, TotalAmount FROM Sales WHERE SaleID = @SaleID";
+
+                DB db = new DB();
+
+                try
+                {
+                    // Fetch the Sale details
+                    DataTable salesDetails;
+                    using (SqlDataReader reader = db.ExecuteReader(getSalesDetailsQuery, new Dictionary<string, object>
+            {
+                { "@SaleID", saleID }
+            }))
+                    {
+                        salesDetails = new DataTable();
+                        salesDetails.Load(reader);
+                    }
+
+                    decimal totalRefundAmount = 0;
+
+                    // Update Product stock for each item in the Sale and calculate refund amount
+                    foreach (DataRow row in salesDetails.Rows)
+                    {
+                        int productID = Convert.ToInt32(row["ProductID"]);
+                        int quantity = Convert.ToInt32(row["Quantity"]);
+                        decimal unitPrice = Convert.ToDecimal(row["UnitPrice"]);
+                        decimal totalDiscount = Convert.ToDecimal(row["DiscountAmount"]);
+
+                        decimal refundAmount = (quantity * unitPrice) - totalDiscount;
+                        totalRefundAmount += refundAmount;
+
+                        // Update Product stock for the returned items
+                        db.ExecuteNonQuery(updateProductStockQuery, new Dictionary<string, object>
+                {
+                    { "@ProductID", productID },
+                    { "@ReturnedQuantity", quantity }
+                });
+                    }
+
+                    // Check if sale was on credit
+                    var creditData = db.ExecuteReader(checkCreditQuery, new Dictionary<string, object>
+            {
+                { "@SaleID", saleID }
+            });
+
+                    if (creditData.Read())
+                    {
+                        bool isCredit = Convert.ToBoolean(creditData["IsCredit"]);
+                        int customerID = isCredit ? Convert.ToInt32(creditData["CustomerID"]) : 0;
+                        decimal saleTotalAmount = Convert.ToDecimal(creditData["TotalAmount"]);
+
+                        if (isCredit)
+                        {
+                            // Deduct total refund amount from customer debt
+                            string updateCustomerDebtQuery = @"
+                        UPDATE Customer
+                        SET TotalDebt = TotalDebt - @ReducedAmount
+                        WHERE CustomerID = @CustomerID";
+
+                            db.ExecuteWithParameters(updateCustomerDebtQuery, new Dictionary<string, object>
+                    {
+                        { "@ReducedAmount", saleTotalAmount },
+                        { "@CustomerID", customerID }
+                    });
+                        }
+                    }
+
+                    // Update SalesDetails
+                    db.ExecuteNonQuery(updateSalesDetailsQuery, new Dictionary<string, object>
+            {
+                { "@SaleID", saleID }
+            });
+
+                    // Mark the Sale as Returned
+                    db.ExecuteNonQuery(updateSalesQuery, new Dictionary<string, object>
+            {
+                { "@SaleID", saleID }
+            });
+
+                    MessageBox.Show("پسوڵە بە سەرکەوتویی گەڕایەوە.");
+                    dataGridView1.DataSource = null;
+                    dataGridView1.Rows.Clear();
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"An error occurred: {ex.Message}");
+                }
+            }
         }
 
         private void ExpenseAmount_KeyPress(object sender, KeyPressEventArgs e)

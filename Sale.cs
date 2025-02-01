@@ -745,6 +745,17 @@ namespace WinFormsApp1
                     e.FormattingApplied = true;
                 }
             }
+            if (dataGridView1.Columns[e.ColumnIndex].Name == "TotalDiscount" && e.Value != null)
+            {
+                if (decimal.TryParse(e.Value.ToString(), out decimal value))
+                {
+                    // Format the value as a thousand separator
+                    e.Value = value.ToString("N0");
+                    e.FormattingApplied = true;
+                }
+            }
+
+
         }
 
 
@@ -755,18 +766,29 @@ namespace WinFormsApp1
         {
             DataGridViewRow row = dataGridView1.Rows[e.RowIndex];
 
-            if (dataGridView1.Columns[e.ColumnIndex].Name == "UnitPrice")
+            // Check if the edited column is "UnitPrice" or "Quantity"
+            if (dataGridView1.Columns[e.ColumnIndex].Name == "UnitPrice" ||
+                dataGridView1.Columns[e.ColumnIndex].Name == "Quantity")
             {
                 decimal originalPrice = 0;
                 decimal newUnitPrice;
                 int quantity;
 
+                // Retrieve values from the DataGridView
                 bool isOriginalPriceValid = decimal.TryParse(row.Cells["OriginalPrice"].Value?.ToString(), out originalPrice);
                 bool isNewPriceValid = decimal.TryParse(row.Cells["UnitPrice"].Value?.ToString(), out newUnitPrice);
                 bool isQuantityValid = int.TryParse(row.Cells["Quantity"].Value?.ToString(), out quantity);
 
                 if (isOriginalPriceValid && isNewPriceValid && isQuantityValid)
                 {
+                    // Ensure quantity is at least 1
+                    if (quantity <= 0)
+                    {
+                        MessageBox.Show("Quantity must be at least 1.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        row.Cells["Quantity"].Value = 1; // Reset to default value
+                        quantity = 1;
+                    }
+
                     // Calculate discount per unit and total discount
                     decimal discountPerUnit = originalPrice - newUnitPrice;
                     decimal totalDiscount = discountPerUnit * quantity;
@@ -775,6 +797,7 @@ namespace WinFormsApp1
                     row.Cells["Subtotal"].Value = (newUnitPrice * quantity).ToString("N0");
                     row.Cells["TotalDiscount"].Value = totalDiscount.ToString("N0");
 
+                    // Update the total amount in the form
                     UpdateTotalAmount();
                 }
                 else
