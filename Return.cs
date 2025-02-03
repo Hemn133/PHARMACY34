@@ -251,7 +251,7 @@ namespace WinFormsApp1
             };
 
                     var salesDetailsData = db.ExecuteReader(querySalesDetails, salesDetailsParams);
-
+                    
                     if (!salesDetailsData.Read())
                     {
                         MessageBox.Show("Sales details not found for the product.");
