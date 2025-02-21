@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Data.SqlClient;
+using Pharmacy;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 
@@ -199,7 +200,7 @@ WHERE s.SaleDate BETWEEN @StartDate AND @EndDate;
                 EndDatePicker.Enabled = false;
 
             }
-           
+
 
 
 
@@ -352,6 +353,8 @@ WHERE s.SaleDate BETWEEN @StartDate AND @EndDate;
             }
         }
 
+
+
         private void txtNetTotal_TextChanged(object sender, EventArgs e)
         {
             if (sender is System.Windows.Forms.TextBox textBox && !string.IsNullOrWhiteSpace(textBox.Text))
@@ -366,6 +369,15 @@ WHERE s.SaleDate BETWEEN @StartDate AND @EndDate;
                     textBox.SelectionStart = textBox.Text.Length; // Maintain caret position
                 }
             }
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            DateTime startDate = StartDatePicker.Value.Date;
+            DateTime endDate = EndDatePicker.Value.Date;
+
+            reportdetails detailsForm = new reportdetails(startDate, endDate);
+            detailsForm.ShowDialog(); // Open the detailed report form
         }
     }
 }

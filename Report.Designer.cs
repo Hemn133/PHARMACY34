@@ -44,6 +44,7 @@
             label2 = new Label();
             label3 = new Label();
             label5 = new Label();
+            button1 = new Button();
             ((System.ComponentModel.ISupportInitialize)dataGridViewReports).BeginInit();
             SuspendLayout();
             // 
@@ -169,7 +170,7 @@
             // txtNetTotal
             // 
             txtNetTotal.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            txtNetTotal.Location = new Point(3, 971);
+            txtNetTotal.Location = new Point(84, 971);
             txtNetTotal.Multiline = true;
             txtNetTotal.Name = "txtNetTotal";
             txtNetTotal.ReadOnly = true;
@@ -194,7 +195,7 @@
             label1.AutoSize = true;
             label1.Font = new Font("NRT Bold", 20.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label1.ForeColor = Color.Teal;
-            label1.Location = new Point(67, 929);
+            label1.Location = new Point(148, 929);
             label1.Name = "label1";
             label1.Size = new Size(135, 39);
             label1.TabIndex = 68;
@@ -233,10 +234,23 @@
             label5.TabIndex = 71;
             label5.Text = "کۆی فرۆشراو\r\n     (قەرز)";
             // 
-            // AdminReport
+            // button1
+            // 
+            button1.Font = new Font("NRT Bold", 20.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            button1.ForeColor = Color.Teal;
+            button1.Location = new Point(3, 971);
+            button1.Name = "button1";
+            button1.Size = new Size(75, 55);
+            button1.TabIndex = 72;
+            button1.Text = "زیاتر";
+            button1.UseVisualStyleBackColor = true;
+            button1.Click += button1_Click;
+            // 
+            // Report
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(button1);
             Controls.Add(label5);
             Controls.Add(label3);
             Controls.Add(label2);
@@ -253,7 +267,7 @@
             Controls.Add(StartDatePicker);
             Controls.Add(dataGridViewReports);
             Controls.Add(label7);
-            Name = "AdminReport";
+            Name = "Report";
             Size = new Size(1616, 1029);
             Load += AdminReport_Load;
             ((System.ComponentModel.ISupportInitialize)dataGridViewReports).EndInit();
@@ -279,5 +293,6 @@
         private Label label2;
         private Label label3;
         private Label label5;
+        private Button button1;
     }
 }
