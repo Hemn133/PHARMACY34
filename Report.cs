@@ -198,21 +198,12 @@ WHERE s.SaleDate BETWEEN @StartDate AND @EndDate;
 
                 StartDatePicker.Enabled = false;
                 EndDatePicker.Enabled = false;
+                button1.Enabled = false;
 
             }
-
-
-
-
-
             style(dataGridViewReports);
             ReverseColumnsOrder(dataGridViewReports);
-
-
         }
-
-
-
         private void style(DataGridView datagridview)
         {
             ReverseColumnsOrder(datagridview);

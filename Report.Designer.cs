@@ -170,7 +170,7 @@
             // txtNetTotal
             // 
             txtNetTotal.Font = new Font("Segoe UI", 18F, FontStyle.Regular, GraphicsUnit.Point, 0);
-            txtNetTotal.Location = new Point(84, 971);
+            txtNetTotal.Location = new Point(151, 971);
             txtNetTotal.Multiline = true;
             txtNetTotal.Name = "txtNetTotal";
             txtNetTotal.ReadOnly = true;
@@ -195,7 +195,7 @@
             label1.AutoSize = true;
             label1.Font = new Font("NRT Bold", 20.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label1.ForeColor = Color.Teal;
-            label1.Location = new Point(148, 929);
+            label1.Location = new Point(216, 929);
             label1.Name = "label1";
             label1.Size = new Size(135, 39);
             label1.TabIndex = 68;
@@ -240,9 +240,9 @@
             button1.ForeColor = Color.Teal;
             button1.Location = new Point(3, 971);
             button1.Name = "button1";
-            button1.Size = new Size(75, 55);
+            button1.Size = new Size(142, 55);
             button1.TabIndex = 72;
-            button1.Text = "زیاتر";
+            button1.Text = "خێر و مایە";
             button1.UseVisualStyleBackColor = true;
             button1.Click += button1_Click;
             // 

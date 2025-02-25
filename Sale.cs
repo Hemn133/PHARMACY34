@@ -212,7 +212,6 @@ namespace WinFormsApp1
         }
         private void AdminSelling_Load(object sender, EventArgs e)
         {
-
             if (dataGridView1.Columns.Count == 0)
             {
                 dataGridView1.Columns.Add("ProductID", "کۆدی کاڵا");       // Product ID
@@ -250,8 +249,6 @@ namespace WinFormsApp1
 
         dataGridView1.Columns.Add(deleteButton);
     }
-
-
 
             // Set default values for DateTimePickers
             dateTimePicker1.Value = DateTime.Today; ; // Start date
@@ -364,7 +361,7 @@ namespace WinFormsApp1
 
                 if (productData.Rows.Count == 0)
                 {
-                    MessageBox.Show("Failed to fetch product details.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show("کاڵا نەگەڕایەوە.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return;
                 }
 
@@ -757,11 +754,6 @@ namespace WinFormsApp1
 
 
         }
-
-
-
-
-
         private void dataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
             DataGridViewRow row = dataGridView1.Rows[e.RowIndex];

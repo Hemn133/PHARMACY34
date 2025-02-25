@@ -1,5 +1,4 @@
-﻿using Microsoft.IdentityModel.Tokens;
-using System;
+﻿using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -15,14 +14,10 @@ namespace WinFormsApp1
     public partial class AdminDashboard : Form
     {
         public string _userRole;
-       
-
         public AdminDashboard(string userRole)
         {
             InitializeComponent();
             _userRole = userRole;
-           
-
         }
         private void LoadUserControl(UserControl newControl)
         {
@@ -35,76 +30,18 @@ namespace WinFormsApp1
             // Add the UserControl to the panel
             panel1.Controls.Add(newControl);
         }
-
-
         private void Dashboard_Load(object sender, EventArgs e)
         {
-            AdjustUIForRole();
+            
             Sale categoryAControl = new Sale(_userRole);
             LoadUserControl(categoryAControl);
         }
-        private void AdjustUIForRole()
-        {
-            if (_userRole == "Admin")
-            {
-                // Admin has full access
-                
-            }
-            else if (_userRole == "Employee")
-            {
-                // Employee has limited access
-                
-            }
-        }
-
-        private void label1_Click(object sender, EventArgs e)
-        {
-            this.Dispose();
-        }
-
-        private void label3_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label2_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label1_Click_1(object sender, EventArgs e)
-        {
-            this.Close();
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void button10_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button11_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void button9_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void button1_Click(object sender, EventArgs e)
         {
             Product categoryAControl = new Product(_userRole);
-
             // Load it into the panel
             LoadUserControl(categoryAControl);
         }
-
         private void button2_Click(object sender, EventArgs e)
         {
             Sale adminSelling = new Sale(_userRole);

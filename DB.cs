@@ -13,6 +13,9 @@ namespace WinFormsApp1
     public class DB
     {
 
+
+
+
         public string ConnectionString
         {
             get
