@@ -48,6 +48,8 @@
             dateTimePicker2 = new DateTimePicker();
             label6 = new Label();
             button2 = new Button();
+            comboBox2 = new ComboBox();
+            checkBox1 = new CheckBox();
             ((System.ComponentModel.ISupportInitialize)dataGridView1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)numericUpDown1).BeginInit();
             ((System.ComponentModel.ISupportInitialize)dataGridView2).BeginInit();
@@ -253,7 +255,7 @@
             dateTimePicker1.CustomFormat = "dd-MM-yyyy";
             dateTimePicker1.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dateTimePicker1.Format = DateTimePickerFormat.Short;
-            dateTimePicker1.Location = new Point(342, 232);
+            dateTimePicker1.Location = new Point(342, 197);
             dateTimePicker1.Name = "dateTimePicker1";
             dateTimePicker1.Size = new Size(200, 33);
             dateTimePicker1.TabIndex = 7;
@@ -263,7 +265,7 @@
             dateTimePicker2.CustomFormat = "dd-MM-yyyy";
             dateTimePicker2.Font = new Font("Segoe UI", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             dateTimePicker2.Format = DateTimePickerFormat.Short;
-            dateTimePicker2.Location = new Point(99, 232);
+            dateTimePicker2.Location = new Point(99, 197);
             dateTimePicker2.Name = "dateTimePicker2";
             dateTimePicker2.Size = new Size(200, 33);
             dateTimePicker2.TabIndex = 8;
@@ -273,7 +275,7 @@
             label6.AutoSize = true;
             label6.Font = new Font("NRT Bold", 15.75F, FontStyle.Regular, GraphicsUnit.Point, 0);
             label6.ForeColor = Color.Teal;
-            label6.Location = new Point(305, 233);
+            label6.Location = new Point(305, 198);
             label6.Name = "label6";
             label6.Size = new Size(31, 30);
             label6.TabIndex = 58;
@@ -283,18 +285,46 @@
             // 
             button2.Font = new Font("NRT Bold", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
             button2.ForeColor = Color.Teal;
-            button2.Location = new Point(3, 231);
+            button2.Location = new Point(3, 197);
             button2.Name = "button2";
-            button2.Size = new Size(90, 34);
+            button2.Size = new Size(90, 68);
             button2.TabIndex = 9;
             button2.Text = "گەڕان";
             button2.UseVisualStyleBackColor = true;
             button2.Click += button2_Click;
             // 
+            // comboBox2
+            // 
+            comboBox2.AutoCompleteMode = AutoCompleteMode.Suggest;
+            comboBox2.AutoCompleteSource = AutoCompleteSource.ListItems;
+            comboBox2.Enabled = false;
+            comboBox2.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            comboBox2.FormattingEnabled = true;
+            comboBox2.ItemHeight = 21;
+            comboBox2.Location = new Point(99, 236);
+            comboBox2.Name = "comboBox2";
+            comboBox2.Size = new Size(200, 29);
+            comboBox2.TabIndex = 59;
+            // 
+            // checkBox1
+            // 
+            checkBox1.AutoSize = true;
+            checkBox1.Font = new Font("NRT Bold", 14.25F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            checkBox1.ForeColor = Color.Teal;
+            checkBox1.Location = new Point(305, 236);
+            checkBox1.Name = "checkBox1";
+            checkBox1.Size = new Size(201, 31);
+            checkBox1.TabIndex = 60;
+            checkBox1.Text = "گەڕان بۆ پسوڵەی قەرز";
+            checkBox1.UseVisualStyleBackColor = true;
+            checkBox1.CheckedChanged += checkBox1_CheckedChanged;
+            // 
             // Sale
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
+            Controls.Add(checkBox1);
+            Controls.Add(comboBox2);
             Controls.Add(button2);
             Controls.Add(label6);
             Controls.Add(dateTimePicker2);
@@ -346,5 +376,7 @@
         private DateTimePicker dateTimePicker2;
         private Label label6;
         private Button button2;
+        private ComboBox comboBox2;
+        private CheckBox checkBox1;
     }
 }

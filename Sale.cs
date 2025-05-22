@@ -238,17 +238,17 @@ namespace WinFormsApp1
             style(dataGridView1);
             style(dataGridView2);
             // Check if the Delete column already exists to avoid duplication
-    if (!dataGridView1.Columns.Contains("Delete"))
-    {
-        DataGridViewButtonColumn deleteButton = new DataGridViewButtonColumn();
-        deleteButton.Name = "Delete";
-        deleteButton.HeaderText = "🗑 سڕینەوە";
-        deleteButton.Text = "❌"; // You can replace it with "Delete"
-        deleteButton.UseColumnTextForButtonValue = true;
-        deleteButton.Width = 80;
+            if (!dataGridView1.Columns.Contains("Delete"))
+            {
+                DataGridViewButtonColumn deleteButton = new DataGridViewButtonColumn();
+                deleteButton.Name = "Delete";
+                deleteButton.HeaderText = "🗑 سڕینەوە";
+                deleteButton.Text = "❌"; // You can replace it with "Delete"
+                deleteButton.UseColumnTextForButtonValue = true;
+                deleteButton.Width = 80;
 
-        dataGridView1.Columns.Add(deleteButton);
-    }
+                dataGridView1.Columns.Add(deleteButton);
+            }
 
             // Set default values for DateTimePickers
             dateTimePicker1.Value = DateTime.Today; ; // Start date
@@ -286,6 +286,22 @@ namespace WinFormsApp1
 
                 // Disable Customer ComboBox initially
                 comboBox1.Enabled = false;
+
+
+                // Populate comboBox2 for filtering by customer in search
+                DataTable customerList = db.GetDataTable("SELECT CustomerID, CustomerName FROM Customer");
+                if (customerList.Rows.Count > 0)
+                {
+                    comboBox2.DataSource = customerList;
+                    comboBox2.DisplayMember = "CustomerName";
+                    comboBox2.ValueMember = "CustomerID";
+                    comboBox2.SelectedIndex = -1;
+                }
+                comboBox2.Enabled = false; // Disable by default
+
+
+
+
             }
             catch (Exception ex)
             {
@@ -662,11 +678,10 @@ namespace WinFormsApp1
         {
             try
             {
-                // Get the start and end dates, stripping the time portion
                 DateTime startDate = dateTimePicker1.Value.Date;
                 DateTime endDate = dateTimePicker2.Value.Date;
 
-                // Query to fetch sales between the selected dates with Username
+                // Base query
                 string query = @"
             SELECT 
                 s.SaleID, 
@@ -677,28 +692,29 @@ namespace WinFormsApp1
             INNER JOIN UserAccount u ON s.UserAccountID = u.UserAccountID
             WHERE s.SaleDate BETWEEN @StartDate AND @EndDate";
 
-                // Prepare parameters for the query
                 Dictionary<string, object> parameters = new Dictionary<string, object>
         {
             { "@StartDate", startDate },
             { "@EndDate", endDate }
         };
 
-                // Fetch data from the database
-                DataTable salesData = db.GetDataTableParam(query, parameters);
+                // Add customer filter if checkbox is checked
+                if (checkBox1.Checked && comboBox2.SelectedValue != null)
+                {
+                    query += " AND s.CustomerID = @CustomerID";
+                    parameters.Add("@CustomerID", comboBox2.SelectedValue);
+                }
 
-                // Bind the fetched data to the DataGridView
+                DataTable salesData = db.GetDataTableParam(query, parameters);
                 dataGridView2.DataSource = salesData;
 
-                // Check if no rows were returned
                 if (salesData.Rows.Count == 0)
                 {
-                    MessageBox.Show("هیچ فرۆشتنێک نییە لەم بەروارە.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("هیچ فرۆشتنێک نییە بەم بەروارە و بەم کڕیارە.", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 }
             }
             catch (Exception ex)
             {
-                // Handle exceptions and display error messages
                 MessageBox.Show("Error fetching sales data: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -796,6 +812,15 @@ namespace WinFormsApp1
                 {
                     MessageBox.Show("Invalid Unit Price, Quantity, or Missing Original Price", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
+            }
+        }
+
+        private void checkBox1_CheckedChanged(object sender, EventArgs e)
+        {
+            comboBox2.Enabled = checkBox1.Checked;
+            if (!checkBox1.Checked)
+            {
+                comboBox2.SelectedIndex = -1; // Clear selection if unchecked
             }
         }
     }
